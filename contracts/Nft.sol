@@ -17,17 +17,17 @@ contract Nft is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
     uint8 private maxNftPerAddressPre = 4;
     uint8 private maxNftPerAddressPublic = 5;
 
-    uint8 private PRE_MAX_NFT_PER_TRANSACTION = 4;
-    uint8 private PUB_MAX_NFT_PER_TRANSACTION = 5;
-    uint8 public SALE;
+    uint8 private maxNftPerTransactionPre = 4;
+    uint8 private maxNftPerTransactionPublic = 5;
+
+    uint8 public sale;
 
     uint256 tokenAmount;
 
     bool private revealed = false;
     string private revealURI = "";
 
-    string private baseURI =
-        "https://www.freepik.com/free-photo/isolated-happy-smiling-dog-white-background-portrait-4_39994000.htm#query=dog%20face&position=0&from_view=keyword&track=ais";
+    string private baseURI = "";
 
     mapping(address => bool) private blackList;
 
@@ -56,7 +56,6 @@ contract Nft is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
         uint256 tokenId,
         uint256 batchSize
     ) internal override(ERC721, ERC721Enumerable) {
-        // Your custom logic here
         super._beforeTokenTransfer(from, to, tokenId, batchSize);
     }
 
@@ -75,7 +74,7 @@ contract Nft is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
         bytes32[] calldata _merkleProof,
         string[] calldata tokenURIs
     ) external payable {
-        require(SALE == 1, "presale is not open");
+        require(sale == 1, "presale is not open");
         require(
             totalSupply() + quantity <= PRE_MAX_SUPPLY,
             "exceeds max supply for presale"
@@ -105,7 +104,7 @@ contract Nft is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
             msg.value >= publicSalePrice * quantity,
             "Insufficient payment"
         );
-        require(SALE == 2, "public is not open");
+        require(sale == 2, "public is not open");
         require(
             totalSupply() + quantity <= PRE_MAX_SUPPLY,
             "exceeds max supply for presale"
@@ -145,7 +144,7 @@ contract Nft is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
     }
 
     function setSale(uint8 _newSaleStatus) external onlyOwner {
-        SALE = _newSaleStatus;
+        sale = _newSaleStatus;
     }
 
     function setMerkleRoot(bytes32 _newMerkleRoot) external onlyOwner {
