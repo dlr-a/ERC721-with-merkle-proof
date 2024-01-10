@@ -51,6 +51,12 @@ describe("Nft", () => {
     });
   });
 
+  describe("supportsInterface", () => {
+    it("supportsInterface works", async () => {
+      expect(await nft.supportsInterface("0x80ac58cd")).to.be.equal(true);
+    });
+  });
+
   describe("addToBlackList", () => {
     it("addToBlackList works", async () => {
       await nft.addToBlackList(wl3.address);
@@ -64,6 +70,13 @@ describe("Nft", () => {
         nft.connect(wl3).publicSaleMint(3, { value: ethers.parseEther("5.0") })
       )
         .to.be.revertedWithCustomError(nft, "AccountAtBlackList")
+        .withArgs(wl3.address);
+    });
+
+    it("should revert because address already added", async () => {
+      await nft.addToBlackList(wl3.address);
+      await expect(nft.addToBlackList(wl3.address))
+        .to.be.revertedWithCustomError(nft, "AddressAlreadyAdded")
         .withArgs(wl3.address);
     });
   });
